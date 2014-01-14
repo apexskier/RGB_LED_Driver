@@ -66,8 +66,15 @@ and the method `hex_to_rgb()` to convert it or `set_hex_color()` and
 `to_hex_color()` to use it directly.
 
 Two types of color setting methods exist. `to_...` will transition a color
-change over a set time. The last argument of any `to_...` method is that delay
-in milliseconds. `set_...` will set a color immediately.
+change over a set time. The last argument of any `to_...` method is that
+transition time in milliseconds (default 300ms). `set_...` will set a color
+immediately.
+
+Currently supported methods are:
+
+- `to_rgb(rgb, fade=DEFAULT)`, `set_rgb(rgb)`
+- `to_rand(r_range=(0, 4095), g_range=(0, 4095), b_range=(0, 4095), fade=DEFAULT)`, `set_rand(r_range=(0, 4095), g_range=(0, 4095), b_range=(0, 4095))`
+- `to_hex_color(color, fade=DEFAULT)`, `set_hex_color(color)`
 
 
 ## Examples

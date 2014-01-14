@@ -105,18 +105,18 @@ class RGBDriver(object):
         self.pwm.setPWM(self.green_pin, 0, rgb[1])
         self.pwm.setPWM(self.blue_pin, 0, rgb[2])
         self.current_color = rgb
-    def to_rgb(self, rgb, delay=DEFAULT_FADE):
-        self.from_to(self.current_color, rgb, delay)
+    def to_rgb(self, rgb, fade=DEFAULT_FADE):
+        self.from_to(self.current_color, rgb, fade)
 
     def set_rand(self, r_range=(0, 4095), g_range=(0, 4095), b_range=(0, 4095)):
         self.set_rgb((randrange(r_range[0], r_range[1]), randrange(g_range[0], g_range[1]), randrange(b_range[0], b_range[1])))
-    def to_rand(self, r_range=(0, 4095), g_range=(0, 4095), b_range=(0, 4095), delay=DEFAULT_FADE):
-        self.to_rgb((randrange(r_range[0], r_range[1]), randrange(g_range[0], g_range[1]), randrange(b_range[0], b_range[1])), delay)
+    def to_rand(self, r_range=(0, 4095), g_range=(0, 4095), b_range=(0, 4095), fade=DEFAULT_FADE):
+        self.to_rgb((randrange(r_range[0], r_range[1]), randrange(g_range[0], g_range[1]), randrange(b_range[0], b_range[1])), fade)
 
     def set_hex_color(self, color):
         self.set_rgb(self.hex_to_rgb(color))
-    def to_hex_color(self, color, delay=DEFAULT_FADE):
-        self.to_rgb(self.hex_to_rgb(color), delay)
+    def to_hex_color(self, color, fade=DEFAULT_FADE):
+        self.to_rgb(self.hex_to_rgb(color), fade)
 
     def from_to(self, rgb_s, rgb_e, duration, freq = 120):
         duration = float(duration)
