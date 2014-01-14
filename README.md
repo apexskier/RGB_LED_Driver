@@ -1,13 +1,11 @@
-RGB LED Driver
-**************
+# RGB LED Driver
 
 This software can be used to drive an analog RGB LED strip using a raspberry pi
 and adafruit's 16-channel 12-bit PWM/Servo Driver - PCA9685:
 http://www.adafruit.com/products/815
 
 
-The Circuit
-===========
+## The Circuit
 
 Here's the basic idea:
 
@@ -24,8 +22,7 @@ Here's the basic idea:
 [Here's a picture](http://github.com/apexskier/rgbLED/blob/master/LED_Strip_bb.png)
 
 
-Dependencies
-============
+## Dependencies
 
 Adafruit's [PWM Servo
 Driver](https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code/blob/master/Adafruit_PWM_Servo_Driver/Adafruit_PWM_Servo_Driver.py)
@@ -35,23 +32,19 @@ Either include these two files somewhere in your PYTHONPATH or in this git repo
 directory.
 
 
-Usage
-=====
+## Usage
 
 This program is designed to be included as a python module, but also has some
 command line options. It, or any python code importing it, must be run as root
 (sudo), because of the I2C interface.
 
-Options
--------
+### Options
 
 
-Examples
-========
+## Examples
 
 
-What's Next?
-============
+## What's Next?
 
 The PWM breakout board has 16 outputs, so, with the right power supply, we
 could drive up to 5 strips at the same time.
