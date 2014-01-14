@@ -43,6 +43,7 @@ class RGBDriver(object):
             self.pwm = self.setup_pwm()
         else:
             self.pwm = pwm
+        #TODO Set self.current color after setting up pwm
 
     @staticmethod
     def setup_pwm(freq = 200):
@@ -141,6 +142,9 @@ class RGBDriver(object):
             self.set_rgb(map(int, rgb))
             print elapsed / duration, rgb
 
+    def to_off(self):
+        self.to_rgb((0, 0, 0))
+
 
 if __name__ == '__main__':
     import argparse
@@ -157,4 +161,4 @@ if __name__ == '__main__':
         # driver.from_to(driver.hex_to_rgb("#6fff00"), driver.hex_to_rgb("#ae00ff"), 5000)
     finally:
         if args.off:
-            driver.to_rgb((0, 0, 0))
+            driver.to_off()
