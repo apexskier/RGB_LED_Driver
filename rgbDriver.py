@@ -146,6 +146,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='drive a rgb led strip through a pwm module')
 
     parser.add_argument('-c', '--color', type=str, help='Set the strip to this color.')
+    parser.add_argument('-o', '--off', action='store_true', help="Turn off after other actions.")
     args = parser.parse_args()
 
     driver = RGB_Driver()
