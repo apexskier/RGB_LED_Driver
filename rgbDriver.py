@@ -145,17 +145,6 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='drive a rgb led strip through a pwm module')
 
-    parser.add_argument('-r', '--red', nargs=2, type=int, default=[0, 0], help="The beginning and end values for red in fade mode.  Max and min values for red in random mode.")
-    parser.add_argument('-g', '--green', nargs=2, type=int, default=[0, 0], help="The beginning and end values for green in fade mode.  Max and min values for green in random mode..")
-    parser.add_argument('-b', '--blue', nargs=2, type=int, default=[0, 0], help="The beginning and end values for blue in fade mode.  Max and min values for blue in random mode..")
-    parser.add_argument('-s', '--steps', type=int, default=100, help="Number of steps in the fade.  Not used with --random")
-    parser.add_argument('-d', '--delay', type=float, default=0.005, help="Number of seconds between the steps or random changes, can be a float")
-    parser.add_argument('-o', '--off', action='store_true', help="Turn off after other actions.")
-    parser.add_argument('--repeat', type=int, default=1, help="Repeat the fade this many times.  Unused with --random.")
-    parser.add_argument('--reverse', action="store_true", help="Reverse the fade, to return back to the initial state.  Unused with --random.")
-    parser.add_argument('--random', action="store_true", help="Move around randomly between the max and min values specified with --red --green and --blue.  Use with --time and --max-random-walk")
-    parser.add_argument('--time', type=int, default=10, help="Used with --random.  Move randomly for this many seconds")
-    parser.add_argument('--max-random-walk', type=int, default=10, help="The max that each channel will be allowed to change between steps in random mode.")
     parser.add_argument('-c', '--color', type=str, help='Set the strip to this color.')
     args = parser.parse_args()
 
@@ -163,15 +152,6 @@ if __name__ == '__main__':
     try:
         if args.color:
             driver.set_hex_color(args.color);
-        elif args.random is False:
-            for repeat in xrange(0, args.repeat):
-                print "Repetition %d" % repeat
-        else:
-            # We need to sort the values to make sure randrange works correctly
-            args.red.sort()
-            args.green.sort()
-            args.blue.sort()
-            driver.random_walk(args.red[0], args.green[0], args.blue[0], args.red[1], args.green[1], args.blue[1], args.time, args.delay, args.max_random_walk)
         # driver.from_to(driver.hex_to_rgb("#6fff00"), driver.hex_to_rgb("#ae00ff"), 5000)
     finally:
         if args.off:
