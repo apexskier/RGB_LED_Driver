@@ -33,7 +33,7 @@ from random import randrange
 
 DEFAULT_FADE = 400
 
-class RGB_Driver(object):
+class RGBDriver(object):
     def __init__(self, pwm = None, red_pin = 0, green_pin = 1, blue_pin = 2):
         self.red_pin = red_pin
         self.green_pin = green_pin
@@ -80,6 +80,7 @@ class RGB_Driver(object):
         else:
             return randrange(start, stop, step)
 
+    #TODO: convert to static method?
     def hex_to_rgb(self, hex_color):
         hex_match = re.match("^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$", hex_color)
         if hex_match:

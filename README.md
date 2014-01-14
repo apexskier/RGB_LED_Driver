@@ -50,9 +50,17 @@ command line options. It, or any python code importing it, must be run as root
 ### As a module
 
 ```
-import
-
+from rgbDriver import RGBDriver
+rgb_driver = RGBDriver()
 ```
+
+Methods in the module use tuples to describe rgb colors: `(red_value,
+green_value, blue_value)`.
+
+Each color value can range between 0 and 4095 (due to the PWM driver's 12 bit
+resolution).
+
+To describe a color you can use the string representation of a hex color code.
 
 
 ## Examples

@@ -1,8 +1,8 @@
 from bottle import redirect, request, route, run, template, get, post, static_file
-from RGB_Driver import RGB_Driver
+from rgbDriver import RGBDriver
 from pprint import pprint
 
-rgb_driver = RGB_Driver()
+rgb_driver = RGBDriver()
 
 @get('/')
 def index():
@@ -28,7 +28,7 @@ def index():
 @post('/color')
 def do_color():
     color = "#" + request.body.read()[9:]
-    rgb_driver.set_hex_color(color)
+    rgb_driver.to_hex_color(color)
     redirect("/")
 
 @route('/static/<filename:path>')
