@@ -57,12 +57,17 @@ rgb_driver = RGBDriver()
 Methods in the module use tuples to describe rgb colors: `(red_value,
 green_value, blue_value)`.
 
-Each color value can range between 0 and 4095 (due to the PWM driver's 12 bit
-resolution).
+Each color value can range between 0 and 4095, due to the PWM driver's 12 bit
+resolution. The `convert_eight_to_twelve_bit()` method can convert a standard 0
+to 255 color value to this scale.
 
 To describe a color you can use the string representation of a hex color code
 and the method `hex_to_rgb()` to convert it or `set_hex_color()` and
 `to_hex_color()` to use it directly.
+
+Two types of color setting methods exist. `to_...` will transition a color
+change over a set time. The last argument of any `to_...` method is that delay
+in milliseconds. `set_...` will set a color immediately.
 
 
 ## Examples
