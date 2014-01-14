@@ -1,8 +1,7 @@
 # RGB LED Driver
 
 This software can be used to drive an analog RGB LED strip using a raspberry pi
-and adafruit's 16-channel 12-bit PWM/Servo Driver - PCA9685:
-http://www.adafruit.com/products/815
+and Adafruit's [16-channel 12-bit PWM/Servo Driver - PCA9685](https://raw2.github.com/apexskier/rgbLED/master/LED_Strip_bb.png):
 
 
 ## The Circuit
@@ -79,9 +78,10 @@ Currently supported methods are:
 - `to_hex_color(color, fade=DEFAULT)`, `set_hex_color(color)`
 
 
-## What's Next?
+## TODO
 
-The PWM breakout board has 16 outputs, so, with the right power supply, we
-could drive up to 5 strips at the same time.
+- I've got a basic single color led strip and an extra N-channel MOSFET that I
+  want to control also.
+- Add docs for server.
+- Set current_color var after setting up pwm.
 
-I plan on updating the code to allow for driving multiple strips.
