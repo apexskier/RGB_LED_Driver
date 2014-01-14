@@ -60,7 +60,7 @@ green_value, blue_value)`.
 Each color value can range between 0 and 4095 (due to the PWM driver's 12 bit
 resolution).
 
-To describe a color you can use the string representation of a hex color code.
+To describe a color you can use the string representation of a hex color code and the method `hex_to_rgb`, `set_hex_color`, or `to_hex_color`.
 
 
 ## Examples
