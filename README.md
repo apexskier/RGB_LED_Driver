@@ -47,6 +47,13 @@ command line options. It, or any python code importing it, must be run as root
 - `-c [hex color]` - sets the led strip to the color specified.
 - `-o` - turn the led strip off after other actions
 
+### As a module
+
+```
+import
+
+```
+
 
 ## Examples
 
