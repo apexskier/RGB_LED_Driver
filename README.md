@@ -3,7 +3,6 @@
 This software can be used to drive an analog RGB LED strip using a raspberry pi
 and Adafruit's [16-channel 12-bit PWM/Servo Driver - PCA9685](https://raw2.github.com/apexskier/rgbLED/master/LED_Strip_bb.png):
 
-
 ## The Circuit
 
 Here's the basic idea:
@@ -24,7 +23,6 @@ Here's the basic idea:
 
 ![Breadboard image](https://raw2.github.com/apexskier/rgbLED/master/LED_Strip_bb.png)
 
-
 ## Dependencies
 
 Adafruit's [PWM Servo
@@ -33,7 +31,6 @@ and
 [Adafruit_I2C](https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code/blob/master/Adafruit_I2C/Adafruit_I2C.py).
 Either include these two files somewhere in your PYTHONPATH or in this git repo's
 directory.
-
 
 ## Usage
 
@@ -76,7 +73,6 @@ Currently supported methods are:
 - `to_rgb(rgb, fade=DEFAULT)`, `set_rgb(rgb)`
 - `to_rand(r_range=(0, 4095), g_range=(0, 4095), b_range=(0, 4095), fade=DEFAULT)`, `set_rand(r_range=(0, 4095), g_range=(0, 4095), b_range=(0, 4095))`
 - `to_hex_color(color, fade=DEFAULT)`, `set_hex_color(color)`
-
 
 ## TODO
 
