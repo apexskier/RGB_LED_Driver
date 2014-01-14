@@ -31,12 +31,14 @@ import Adafruit_PWM_Servo_Driver
 import time, re
 from random import randrange
 
+DEFAULT_FADE = 400
 
 class RGB_Driver(object):
     def __init__(self, pwm = None, red_pin = 0, green_pin = 1, blue_pin = 2):
         self.red_pin = red_pin
         self.green_pin = green_pin
         self.blue_pin = blue_pin
+        self.current_color = (0, 0, 0)
         if pwm is None:
             self.pwm = self.setup_pwm()
         else:
@@ -78,17 +80,6 @@ class RGB_Driver(object):
         else:
             return randrange(start, stop, step)
 
-
-    def set_rgb(self, rgb):
-        """The rgb values must be between 0 and 4095"""
-        #print "R: %d, G: %d, B: %d" % (red_value, green_value, blue_value)
-        self.pwm.setPWM(self.red_pin, 0, rgb[0])
-        self.pwm.setPWM(self.green_pin, 0, rgb[1])
-        self.pwm.setPWM(self.blue_pin, 0, rgb[2])
-
-    def set_rand(self):
-        self.set_rgb((randrange(0, 4080), randrange(0, 4080), randrange(0, 4080)))
-
     def hex_to_rgb(self, hex_color):
         hex_match = re.match("^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$", hex_color)
         if hex_match:
@@ -105,8 +96,26 @@ class RGB_Driver(object):
             print "Invalid hex color supplied: {:s}".format(hex_color)
             return None
 
+
+    def set_rgb(self, rgb):
+        """The rgb values must be between 0 and 4095"""
+        #print "R: %d, G: %d, B: %d" % (red_value, green_value, blue_value)
+        self.pwm.setPWM(self.red_pin, 0, rgb[0])
+        self.pwm.setPWM(self.green_pin, 0, rgb[1])
+        self.pwm.setPWM(self.blue_pin, 0, rgb[2])
+        self.current_color = rgb
+    def to_rgb(self, rgb, delay=DEFAULT_FADE):
+        self.from_to(self.current_color, rgb, delay)
+
+    def set_rand(self, r_range=(0, 4095), g_range=(0, 4095), b_range=(0, 4095)):
+        self.set_rgb((randrange(r_range[0], r_range[1]), randrange(g_range[0], g_range[1]), randrange(b_range[0], b_range[1])))
+    def to_rand(self, r_range=(0, 4095), g_range=(0, 4095), b_range=(0, 4095), delay=DEFAULT_FADE):
+        self.to_rgb((randrange(r_range[0], r_range[1]), randrange(g_range[0], g_range[1]), randrange(b_range[0], b_range[1])), delay)
+
     def set_hex_color(self, color):
         self.set_rgb(self.hex_to_rgb(color))
+    def to_hex_color(self, color, delay=DEFAULT_FADE):
+        self.to_rgb(self.hex_to_rgb(color), delay)
 
     def from_to(self, rgb_s, rgb_e, duration, freq = 120):
         duration = float(duration)
@@ -152,7 +161,6 @@ if __name__ == '__main__':
 
     driver = RGB_Driver()
     try:
-        """
         if args.color:
             driver.set_hex_color(args.color);
         elif args.random is False:
@@ -164,8 +172,7 @@ if __name__ == '__main__':
             args.green.sort()
             args.blue.sort()
             driver.random_walk(args.red[0], args.green[0], args.blue[0], args.red[1], args.green[1], args.blue[1], args.time, args.delay, args.max_random_walk)
-        """
-        driver.from_to(driver.hex_to_rgb("#6fff00"), driver.hex_to_rgb("#ae00ff"), 5000)
+        # driver.from_to(driver.hex_to_rgb("#6fff00"), driver.hex_to_rgb("#ae00ff"), 5000)
     finally:
         if args.off:
-            driver.set_rgb((0, 0, 0))
+            driver.to_rgb((0, 0, 0))
