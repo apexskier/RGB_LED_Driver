@@ -3,28 +3,6 @@
 This software can be used to drive an analog RGB LED strip using a raspberry pi
 and adafruit's 16-channel 12-bit PWM/Servo Driver - PCA9685:
 http://www.adafruit.com/products/815
-
-
-
-
-Copyright (C) 2013 Jeremy Smith
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import Adafruit_PWM_Servo_Driver
@@ -154,7 +132,7 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--off', action='store_true', help="Turn off after other actions.")
     args = parser.parse_args()
 
-    driver = RGB_Driver()
+    driver = RGBDriver()
     try:
         if args.color:
             driver.set_hex_color(args.color);
