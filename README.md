@@ -34,6 +34,10 @@ and
 Either include these two files somewhere in your PYTHONPATH or in this git repo's
 directory.
 
+### Server
+
+- [Bottle](http://bottlepy.org/docs/dev/index.html)
+- [bottle-websocket](https://github.com/zeekay/bottle-websocket)
 
 ## Usage
 
