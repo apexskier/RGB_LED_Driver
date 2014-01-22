@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 """
 This software can be used to drive an analog RGB LED strip using a raspberry pi
 and adafruit's 16-channel 12-bit PWM/Servo Driver - PCA9685:
@@ -122,6 +122,7 @@ class RGBDriver(object):
 
     def to_off(self):
         self.to_rgb((0, 0, 0))
+        self.set_rgb((0, 0, 0))
 
 
 if __name__ == '__main__':
@@ -130,12 +131,20 @@ if __name__ == '__main__':
 
     parser.add_argument('-c', '--color', type=str, help='Set the strip to this color.')
     parser.add_argument('-o', '--off', action='store_true', help="Turn off after other actions.")
+    parser.add_argument('-t', '--test', action='store_true', help="test.")
     args = parser.parse_args()
 
     driver = RGBDriver()
     try:
+        if args.test:
+            driver.to_hex_color("#ffffff")
+            driver.to_hex_color("#ff0000")
+            driver.to_hex_color("#00ff00")
+            driver.to_hex_color("#0000ff")
+            driver.to_hex_color("#000000")
+            driver.set_hex_color("#000000")
         if args.color:
-            driver.set_hex_color(args.color);
+            driver.set_hex_color(args.color)
         # driver.from_to(driver.hex_to_rgb("#6fff00"), driver.hex_to_rgb("#ae00ff"), 5000)
     finally:
         if args.off:
