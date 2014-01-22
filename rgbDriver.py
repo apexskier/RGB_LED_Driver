@@ -11,18 +11,7 @@ from random import randrange
 
 DEFAULT_FADE = 400
 
-class RGBDriver(object):
-    def __init__(self, pwm = None, red_pin = 0, green_pin = 1, blue_pin = 2):
-        self.red_pin = red_pin
-        self.green_pin = green_pin
-        self.blue_pin = blue_pin
-        self.current_color = (0, 0, 0)
-        if pwm is None:
-            self.pwm = self.setup_pwm()
-        else:
-            self.pwm = pwm
-        #TODO Set self.current color after setting up pwm
-
+class LEDDriver(object):
     @staticmethod
     def setup_pwm(freq = 200):
         pwm = Adafruit_PWM_Servo_Driver.PWM()
@@ -59,6 +48,57 @@ class RGBDriver(object):
         else:
             return randrange(start, stop, step)
 
+class SingleLEDDriver(LEDDriver):
+    def __init__(self, pwm = None, pin = 3):
+        self.pin = pin
+        self.current_brightness = 0
+        if pwm is None:
+            self.pwm = self.setup_pwm()
+        else:
+            self.pwm = pwm
+
+    def from_to(self, l_s, l_e, duration, freq = 120):
+        duration = float(duration)
+        l_diff = l_e - l_s
+
+        start = time.time()
+        while True:
+            elapsed = float(time.time() - start) * 1000
+            if elapsed >= duration:
+                break
+            l = l_s + l_diff * (elapsed / duration)
+            #time.sleep(float(freq) / 1000)
+            self.set_l(l)
+
+    def set_l(self, l):
+        """The rgb values must be between 0 and 4095"""
+        #print "R: %d, G: %d, B: %d" % (red_value, green_value, blue_value)
+        self.pwm.setPWM(self.pin, 0, self.sanitize_int(l))
+        self.current_brightness = l
+    def to_l(self, l, fade=DEFAULT_FADE):
+        self.from_to(self.current_brightness, l, fade)
+
+    def set_rand(self, l_range=(0, 4095)):
+        self.set_l(randrange(l_range[0], l_range[1]))
+    def to_rand(self, l_range=(0, 4095), fade=DEFAULT_FADE):
+        self.to_l(randrange(l_range[0], l_range[1]), fade)
+
+    def to_off(self):
+        self.to_l(0)
+        self.set_l(0)
+
+class RGBDriver(LEDDriver):
+    def __init__(self, pwm = None, red_pin = 0, green_pin = 1, blue_pin = 2):
+        self.red_pin = red_pin
+        self.green_pin = green_pin
+        self.blue_pin = blue_pin
+        self.current_color = (0, 0, 0)
+        if pwm is None:
+            self.pwm = self.setup_pwm()
+        else:
+            self.pwm = pwm
+        #TODO Set self.current color after setting up pwm
+
     #TODO: convert to static method?
     def hex_to_rgb(self, hex_color):
         hex_match = re.match("^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$", hex_color)
@@ -76,13 +116,11 @@ class RGBDriver(object):
             print "Invalid hex color supplied: {:s}".format(hex_color)
             return None
 
-
     def set_rgb(self, rgb):
         """The rgb values must be between 0 and 4095"""
-        #print "R: %d, G: %d, B: %d" % (red_value, green_value, blue_value)
-        self.pwm.setPWM(self.red_pin, 0, rgb[0])
-        self.pwm.setPWM(self.green_pin, 0, rgb[1])
-        self.pwm.setPWM(self.blue_pin, 0, rgb[2])
+        self.pwm.setPWM(self.red_pin, 0, self.sanitize_int(rgb[0]))
+        self.pwm.setPWM(self.green_pin, 0, self.sanitize_int(rgb[1]))
+        self.pwm.setPWM(self.blue_pin, 0, self.sanitize_int(rgb[2]))
         self.current_color = rgb
     def to_rgb(self, rgb, fade=DEFAULT_FADE):
         self.from_to(self.current_color, rgb, fade)
@@ -105,8 +143,6 @@ class RGBDriver(object):
                 (rgb_e[1] - rgb_s[1]),
                 (rgb_e[2] - rgb_s[2])
             ]
-        print duration
-        print rgb_diff
 
         start = time.time()
         while True:
@@ -118,12 +154,10 @@ class RGBDriver(object):
             rgb[2] = rgb_s[2] + rgb_diff[2] * (elapsed / duration)
             #time.sleep(float(freq) / 1000)
             self.set_rgb(map(int, rgb))
-            print elapsed / duration, rgb
 
     def to_off(self):
         self.to_rgb((0, 0, 0))
         self.set_rgb((0, 0, 0))
-
 
 if __name__ == '__main__':
     import argparse
@@ -134,18 +168,22 @@ if __name__ == '__main__':
     parser.add_argument('-t', '--test', action='store_true', help="test.")
     args = parser.parse_args()
 
-    driver = RGBDriver()
+    rgb_driver = RGBDriver()
+    single_driver = SingleLEDDriver()
     try:
         if args.test:
-            driver.to_hex_color("#ffffff")
-            driver.to_hex_color("#ff0000")
-            driver.to_hex_color("#00ff00")
-            driver.to_hex_color("#0000ff")
-            driver.to_hex_color("#000000")
-            driver.set_hex_color("#000000")
+            rgb_driver.to_hex_color("#ffffff")
+            rgb_driver.to_hex_color("#ff0000")
+            rgb_driver.to_hex_color("#00ff00")
+            rgb_driver.to_hex_color("#0000ff")
+            rgb_driver.to_hex_color("#000000")
+            rgb_driver.set_hex_color("#000000")
+            single_driver.to_l(4095);
+            single_driver.to_off();
         if args.color:
-            driver.set_hex_color(args.color)
-        # driver.from_to(driver.hex_to_rgb("#6fff00"), driver.hex_to_rgb("#ae00ff"), 5000)
+            rgb_driver.set_hex_color(args.color)
+        # rgb_driver.from_to(rgb_driver.hex_to_rgb("#6fff00"), rgb_driver.hex_to_rgb("#ae00ff"), 5000)
     finally:
         if args.off:
-            driver.to_off()
+            rgb_driver.to_off()
+            single_driver.to_off();
