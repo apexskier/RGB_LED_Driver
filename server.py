@@ -1,38 +1,32 @@
+import json
 from bottle import redirect, request, route, run, template, get, post, static_file
-from rgbDriver import RGBDriver
-from pprint import pprint
+from bottle.ext.websocket import GeventWebSocketServer
+from bottle.ext.websocket import websocket
+from rgbDriver import RGBDriver, SingleLEDDriver
 
 rgb_driver = RGBDriver()
+simple_driver = SingleLEDDriver()
 
 @get('/')
 def index():
-    return '''
-        <link rel="stylesheet" href="/static/farbtastic/farbtastic.css"></link>
-        <form action="/color" method="post">
-            Color: <input name="color" id="color" type="text" value="#123456">
-        </form>
-        <div id="colorpicker"></div>
-        <script src="/static/jquery-2.0.3.min.js"></script>
-        <script src="/static/farbtastic/farbtastic.js"></script>
+    return template('index')
 
-        <script type="text/javascript">
-            $(document).ready(function() {
-                $('#colorpicker').farbtastic(function(c) {
-                    $('#color').val(c);
-                    $.post("/color", { color: c });
-                });
-            });
-        </script>
-    '''
-
-@post('/color')
-def do_color():
-    color = "#" + request.body.read()[9:]
-    rgb_driver.to_hex_color(color)
-    redirect("/")
+@get('/control', apply=[websocket])
+def do_color(ws):
+    while True:
+        message = ws.receive()
+        if message:
+            print "Recieved message: " + message
+            data = json.loads(message)
+            if data[u'action'] == 'color':
+                rgb_driver.set_hex_color(data[u'value'])
+            elif data[u'action'] == 'set_simple':
+                simple_driver.set_l(data[u'value'])
+        else:
+            break
 
 @route('/static/<filename:path>')
 def send_static(filename):
     return static_file(filename, root='static')
 
-run(host='0.0.0.0', port=8080)
+run(host='0.0.0.0', port=8080, server=GeventWebSocketServer)
