@@ -9,7 +9,7 @@ import Adafruit_PWM_Servo_Driver
 import time, re
 from random import randrange
 
-DEFAULT_FADE = 400
+DEFAULT_FADE = 200
 
 class LEDDriver(object):
     @staticmethod
@@ -49,7 +49,7 @@ class LEDDriver(object):
             return randrange(start, stop, step)
 
 class SingleLEDDriver(LEDDriver):
-    def __init__(self, pwm = None, pin = 3):
+    def __init__(self, pin = 3, pwm = None):
         self.pin = pin
         self.current_brightness = 0
         if pwm is None:
@@ -88,7 +88,7 @@ class SingleLEDDriver(LEDDriver):
         self.set_l(0)
 
 class RGBDriver(LEDDriver):
-    def __init__(self, pwm = None, red_pin = 0, green_pin = 1, blue_pin = 2):
+    def __init__(self, red_pin = 0, green_pin = 1, blue_pin = 2, pwm = None):
         self.red_pin = red_pin
         self.green_pin = green_pin
         self.blue_pin = blue_pin

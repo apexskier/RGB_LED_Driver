@@ -2,12 +2,34 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title></title>
 
-    <link rel="stylesheet" href="/static/farbtastic/farbtastic.css"></link>
     <style>
+        * {
+            box-sizing: border-box;
+        }
         input[type="range"] {
-            width: 100%;
+            width: 90%;
+            margin-left: 5%;
+            margin-right: 5%;
+        }
+        #hue {
+            -webkit-appearance: none;
+            background-image: -webkit-linear-gradient(left,
+                hsl(0, 100%, 50%) 0%,
+                hsl(120, 100%, 50%) 33.3333%,
+                hsl(240, 100%, 50%) 66.6667%,
+                hsl(360, 100%, 50%) 100%);
+        }
+        input[type="range"]#hue::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 40px;
+            width: 20px;
+            background: black;
+            border: 2px solid white;
+            border-radius: 2px;
         }
     </style>
 </head>
@@ -18,14 +40,13 @@
         <input id="sat" name="sat" type="range" min="0" max="1" step=".003921569" value="1"><br>
         <input id="light" name="light" type="range" min="0" max="1" step=".003921569"><br>
         <hr>
-        <label for="colorpicker">Color wheel</label>
-        <div id="colorpicker"></div>
-        <hr>
         <label for="brightness">Simple led brightness</label><br>
         <input id="brightness" name="brightness" type="range" min="0" max="4095" step="5">
+        <hr>
+        <button name="rgb1off" id="rgb1off">RGB off</button>
+        <button name="led1off" id="led1off">LED off</button>
     </form>
     <script src="/static/jquery-2.0.3.min.js"></script>
-    <script src="/static/farbtastic/farbtastic.js"></script>
 
     <script type="text/javascript">
         $(document).ready(function() {
@@ -48,15 +69,48 @@
             ws.onclose = function(evt) {
                 console.log('WebSocket connection closed.');
             }
-            $('#colorpicker').farbtastic(function(c) {
-                ws.send(JSON.stringify({action: "color", value: c}));
-            });
             $('#brightness').change(function(e) {
-                ws.send(JSON.stringify({action: "set_simple", value: e.target.valueAsNumber}));
+                ws.send(JSON.stringify({
+                    target: "led1",
+                    action: "set",
+                    value: e.target.valueAsNumber
+                }));
             });
             $('#hue, #sat, #light').change(function() {
                 var color = HSVtoRGB(parseFloat($('#hue').val()), parseFloat($('#sat').val()), parseFloat($('#light').val()));
-                ws.send(JSON.stringify({action: "color", value: rgbToHex(color.r, color.g, color.b)}));
+                ws.send(JSON.stringify({
+                    target: "rgb1",
+                    action: "set",
+                    value: rgbToHex(color.r, color.g, color.b)
+                }));
+            });
+            $('#sat, #light').change(function(e) {
+                $('#hue').css('background-image', '-webkit-linear-gradient(left,' +
+                    'hsla(0,   100%, ' + (parseFloat($('#light').val()) * 50) + '%, ' + parseFloat($('#sat').val()) + ') 0%,' +
+                    'hsla(120, 100%, ' + (parseFloat($('#light').val()) * 50) + '%, ' + parseFloat($('#sat').val()) + ') 33.3333%,' +
+                    'hsla(240, 100%, ' + (parseFloat($('#light').val()) * 50) + '%, ' + parseFloat($('#sat').val()) + ') 66.6667%,' +
+                    'hsla(360, 100%, ' + (parseFloat($('#light').val()) * 50) + '%, ' + parseFloat($('#sat').val()) + ') 100%)');
+            });
+            $('#rgb1off').click(function(e) {
+                e.preventDefault()
+                ws.send(JSON.stringify({
+                    target: "rgb1",
+                    action: "off"
+                }));
+                $('#light').val(0);
+                $('#hue').css('background-image', '-webkit-linear-gradient(left,' +
+                    'hsla(0,   100%, 0%, ' + parseFloat($('#sat').val()) + ') 0%,' +
+                    'hsla(120, 100%, 0%, ' + parseFloat($('#sat').val()) + ') 33.3333%,' +
+                    'hsla(240, 100%, 0%, ' + parseFloat($('#sat').val()) + ') 66.6667%,' +
+                    'hsla(360, 100%, 0%, ' + parseFloat($('#sat').val()) + ') 100%)');
+            });
+            $('#led1off').click(function(e) {
+                e.preventDefault();
+                ws.send(JSON.stringify({
+                    target: "led1",
+                    action: "off"
+                }));
+                $('#brightness').val(0);
             });
         });
         function HSVtoRGB(h, s, v) {

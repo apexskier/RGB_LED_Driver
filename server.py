@@ -4,24 +4,35 @@ from bottle.ext.websocket import GeventWebSocketServer
 from bottle.ext.websocket import websocket
 from rgbDriver import RGBDriver, SingleLEDDriver
 
-rgb_driver = RGBDriver()
-simple_driver = SingleLEDDriver()
+targets = {
+        'rgb1': RGBDriver(0, 1, 2),
+        'led1': SingleLEDDriver(3)
+    }
 
 @get('/')
 def index():
     return template('index')
 
 @get('/control', apply=[websocket])
-def do_color(ws):
+def control(ws):
     while True:
         message = ws.receive()
         if message:
             print "Recieved message: " + message
             data = json.loads(message)
-            if data[u'action'] == 'color':
-                rgb_driver.set_hex_color(data[u'value'])
-            elif data[u'action'] == 'set_simple':
-                simple_driver.set_l(data[u'value'])
+            driver = None
+            if u'target' in data:
+                driver = targets[str(data[u'target'])]
+                driver_type = type(driver)
+                action = data[u'action']
+                if action == 'set':
+                    if driver_type == RGBDriver:
+                        driver.set_hex_color(data[u'value'])
+                    elif driver_type == SingleLEDDriver:
+                        driver.set_l(data[u'value'])
+                if action == 'off':
+                    driver.to_off()
+
         else:
             break
 
