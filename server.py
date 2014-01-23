@@ -29,7 +29,7 @@ def control(ws):
                     if driver_type == RGBDriver:
                         driver.set_hex_color(data[u'value'])
                     elif driver_type == SingleLEDDriver:
-                        driver.set_l(data[u'value'])
+                        driver.set_(data[u'value'])
                 if action == 'off':
                     driver.to_off()
 
