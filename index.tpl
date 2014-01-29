@@ -45,6 +45,10 @@
         <hr>
         <button name="rgb1off" id="rgb1off">RGB off</button>
         <button name="led1off" id="led1off">LED off</button>
+        <hr>
+        <b>Thermostat</b><br>
+        Current temperature: <span class="temp-current">{{ current_temp if current_temp else "Unknown" }}</span>{{ last_time if last_time else ""}}<br>
+        Target temperature: <input type="number" min="50" max="85" step="1" name="temperature" id="temperature" value="{{ target_temp }}">
     </form>
     <script src="/static/jquery-2.0.3.min.js"></script>
 
@@ -64,7 +68,8 @@
                 console.log('Websocket connection opened.');
             }
             ws.onmessage = function(evt) {
-                console.log(evt.data);
+                data = JSON.parse(evt.data);
+
             }
             ws.onclose = function(evt) {
                 console.log('WebSocket connection closed.');
@@ -90,6 +95,13 @@
                     'hsla(120, 100%, ' + (parseFloat($('#light').val()) * 50) + '%, ' + parseFloat($('#sat').val()) + ') 33.3333%,' +
                     'hsla(240, 100%, ' + (parseFloat($('#light').val()) * 50) + '%, ' + parseFloat($('#sat').val()) + ') 66.6667%,' +
                     'hsla(360, 100%, ' + (parseFloat($('#light').val()) * 50) + '%, ' + parseFloat($('#sat').val()) + ') 100%)');
+            });
+            $('#temperature').change(function(e) {
+                ws.send(JSON.stringify({
+                    target: "thermostat",
+                    action: "set",
+                    value: e.target.value
+                }));
             });
             $('#rgb1off').click(function(e) {
                 e.preventDefault()
