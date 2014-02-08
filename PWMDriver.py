@@ -108,4 +108,12 @@ class PWM(object):
         self.i2c.writeReg8(self.fd, self.__LED0_OFF_H + 4 * channel, val >> 8)
 
     def readPWM(self, channel):
-        return self.i2c.readReg8(self.fd, channel)
+        """
+        Returns the value of a single PWM channel.
+
+        Parameters
+        channel: The channel (int)
+        """
+        low  = self.i2c.readReg8(self.fd, self.__LED0_OFF_L + 4 * channel)
+        high = self.i2c.readReg8(self.fd, self.__LED0_OFF_H + 4 * channel)
+        return (high << 8) + low
