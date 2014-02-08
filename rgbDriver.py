@@ -5,17 +5,17 @@ and adafruit's 16-channel 12-bit PWM/Servo Driver - PCA9685:
 http://www.adafruit.com/products/815
 """
 
-import Adafruit_PWM_Servo_Driver
 import time, re, math
 from random import randrange
 from threading import Thread
+import PWMDriver
 
 DEFAULT_FADE = 200
 
 class LEDDriver(object):
     @staticmethod
-    def setup_pwm(freq = 200):
-        pwm = Adafruit_PWM_Servo_Driver.PWM()
+    def setup_pwm(freq=200):
+        pwm = PWMDriver.PWM()
         pwm.setPWMFreq(freq)
         return pwm
 
@@ -31,15 +31,6 @@ class LEDDriver(object):
         2048
         """
         return eight_bit << 4
-
-    @staticmethod
-    def sanitize_int(x):
-        if x < 0:
-            return 0
-        elif x > 4095:
-            return 4095
-        else:
-            return int(x)
 
     @staticmethod
     def randrange(start, stop, step = 1):
@@ -71,10 +62,9 @@ class LEDDriver(object):
                 elapsed = float(time.time() - start_time) * 1000
                 if elapsed >= duration:
                     break
-                self.pwm.setPWM(pin, 0, self.sanitize_int(function(elapsed)))
+                self.pwm.setPWM(pin, function(elapsed))
         t = Thread(target=repeat_internal, args=(pin, function, duration))
         return t
-
 
 class SingleLEDDriver(LEDDriver):
     def __init__(self, pin = 3, pwm = None):
@@ -101,7 +91,7 @@ class SingleLEDDriver(LEDDriver):
     def set_(self, l):
         """The rgb values must be between 0 and 4095"""
         #print "R: %d, G: %d, B: %d" % (red_value, green_value, blue_value)
-        self.pwm.setPWM(self.pin, 0, self.sanitize_int(l))
+        self.pwm.setPWM(self.pin, l)
         self.current_brightness = l
     def to_(self, l, fade=DEFAULT_FADE):
         self.from_to(self.current_brightness, l, fade)
@@ -147,9 +137,9 @@ class RGBDriver(LEDDriver):
 
     def set_(self, rgb):
         """The rgb values must be between 0 and 4095"""
-        self.pwm.setPWM(self.red_pin, 0, self.sanitize_int(rgb[0]))
-        self.pwm.setPWM(self.green_pin, 0, self.sanitize_int(rgb[1]))
-        self.pwm.setPWM(self.blue_pin, 0, self.sanitize_int(rgb[2]))
+        self.pwm.setPWM(self.red_pin, rgb[0])
+        self.pwm.setPWM(self.green_pin, rgb[1])
+        self.pwm.setPWM(self.blue_pin, rgb[2])
         self.current_color = rgb
     def to_(self, rgb, fade=DEFAULT_FADE):
         self.from_to(self.current_color, rgb, fade)
