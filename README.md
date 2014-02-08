@@ -3,7 +3,6 @@
 This software can be used to drive an analog RGB LED strip using a raspberry pi
 and Adafruit's [16-channel 12-bit PWM/Servo Driver - PCA9685](https://raw2.github.com/apexskier/rgbLED/master/LED_Strip_bb.png):
 
-
 ## The Circuit
 
 Here's the basic idea:
@@ -27,12 +26,7 @@ Here's the basic idea:
 
 ## Dependencies
 
-Adafruit's [PWM Servo
-Driver](https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code/blob/master/Adafruit_PWM_Servo_Driver/Adafruit_PWM_Servo_Driver.py)
-and
-[Adafruit_I2C](https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code/blob/master/Adafruit_I2C/Adafruit_I2C.py).
-Either include these two files somewhere in your PYTHONPATH or in this git repo's
-directory.
+- [WiringPi2 Python](https://github.com/WiringPi/WiringPi2-Python)
 
 ### Server
 
@@ -85,7 +79,6 @@ Currently supported methods are:
 ## TODO
 
 - I've got a basic single color led strip and an extra N-channel MOSFET that I
-  want to control also.
-- Add docs for server.
+  want to control.
 - Set current_color var after setting up pwm.
 
