@@ -28,11 +28,6 @@ Here's the basic idea:
 
 - [WiringPi2 Python](https://github.com/WiringPi/WiringPi2-Python)
 
-### Server
-
-- [Bottle](http://bottlepy.org/docs/dev/index.html)
-- [bottle-websocket](https://github.com/zeekay/bottle-websocket)
-
 ## Usage
 
 This program is designed to be included as a python module, but also has some
@@ -41,8 +36,9 @@ command line options. It, or any python code importing it, must be run as root
 
 ### CLI Options
 
-- `-c [hex color]` - sets the led strip to the color specified.
-- `-o` - turn the led strip off after other actions
+- `-c [hex color]` - Sets the led strip to the color specified.
+- `-t` - Runs a test of a couple things. Use as a demo.
+- `-o` - Turn the led strip off after other actions.
 
 ### As a module
 
