@@ -162,14 +162,14 @@ class RGBDriver(_LEDDriver):
                 self.pwm.readPWM(self.blue_pin)
             )
 
-    #TODO: convert to static method?
-    def hex_to_(self, hex_color):
+    @staticmethod
+    def hex_to_rgb(hex_color):
         hex_color = hex_color.lower()
         hex_match = re.match("^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$", hex_color)
         if hex_match:
-            r = self.convert_eight_to_twelve_bit(int(hex_match.group(1), 16))
-            g = self.convert_eight_to_twelve_bit(int(hex_match.group(2), 16))
-            b = self.convert_eight_to_twelve_bit(int(hex_match.group(3), 16))
+            r = _LEDDriver.convert_eight_to_twelve_bit(int(hex_match.group(1), 16))
+            g = _LEDDriver.convert_eight_to_twelve_bit(int(hex_match.group(2), 16))
+            b = _LEDDriver.convert_eight_to_twelve_bit(int(hex_match.group(3), 16))
             return (r, g, b)
         elif hex_color == "rand" or hex_color == "random":
             r = randrange(0, 4080)
@@ -189,12 +189,17 @@ class RGBDriver(_LEDDriver):
         return self.current_color
 
     def set_(self, rgb):
-        """The rgb values must be between 0 and 4095"""
+        """
+        Input must be between 0 and 4095.
+        """
         self.pwm.setPWM(self.red_pin, rgb[0])
         self.pwm.setPWM(self.green_pin, rgb[1])
         self.pwm.setPWM(self.blue_pin, rgb[2])
         self.current_color = rgb
     def to_(self, rgb, fade=DEFAULT_FADE):
+        """
+        Input must be between 0 and 4095.
+        """
         self.from_to(self.current_color, rgb, fade)
 
     def set_rand(self, r_range=(0, 4095), g_range=(0, 4095), b_range=(0, 4095)):
@@ -203,9 +208,9 @@ class RGBDriver(_LEDDriver):
         self.to_((randrange(r_range[0], r_range[1]), randrange(g_range[0], g_range[1]), randrange(b_range[0], b_range[1])), fade)
 
     def set_hex_color(self, color):
-        self.set_(self.hex_to_(color))
+        self.set_(RGBDriver.hex_to_rgb(color))
     def to_hex_color(self, color, fade=DEFAULT_FADE):
-        self.to_(self.hex_to_(color), fade)
+        self.to_(RGBDriver.hex_to_rgb(color), fade)
 
     def from_to(self, start, end, duration):
         duration = float(duration)
@@ -280,7 +285,6 @@ if __name__ == '__main__':
             single_driver.to_off()
         if args.color:
             rgb_driver.set_hex_color(args.color)
-        # rgb_driver.from_to(rgb_driver.hex_to_("#6fff00"), rgb_driver.hex_to_("#ae00ff"), 5000)
     finally:
         if args.off:
             rgb_driver.to_off()
