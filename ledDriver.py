@@ -68,16 +68,21 @@ class _LEDDriver(object):
         """
         pass
 
-    def set_(self, target):
+    def set(self, target):
         """
         Set value [target]
         """
         pass
-    def to_(self, target, fade=DEFAULT_FADE):
+    def to(self, target, fade=DEFAULT_FADE):
         """
         Fade to value [target] over a time [fade (optional)] in milliseconds.
         """
         pass
+
+    def off(self):
+        """
+        Turns light off
+        """
 
     def repeat(self, pin, function, duration=-1):
         """
@@ -128,24 +133,24 @@ class SingleLEDDriver(_LEDDriver):
             if elapsed >= duration:
                 break
             l = start + diff * (elapsed / duration)
-            self.set_(l)
+            self.set(l)
 
-    def set_(self, l):
+    def set(self, l):
         """The rgb values must be between 0 and 4095"""
         #print "R: %d, G: %d, B: %d" % (red_value, green_value, blue_value)
         self.pwm.setPWM(self.pin, l)
         self.current_brightness = l
-    def to_(self, l, fade=DEFAULT_FADE):
+    def to(self, l, fade=DEFAULT_FADE):
         self.from_to(self.current_brightness, l, fade)
 
     def set_rand(self, l_range=(0, 4095)):
-        self.set_(randrange(l_range[0], l_range[1]))
+        self.set(randrange(l_range[0], l_range[1]))
     def to_rand(self, l_range=(0, 4095), fade=DEFAULT_FADE):
-        self.to_(randrange(l_range[0], l_range[1]), fade)
+        self.to(randrange(l_range[0], l_range[1]), fade)
 
-    def to_off(self):
-        self.to_(0)
-        self.set_(0)
+    def off(self):
+        self.to(0)
+        self.set(0)
 
 class RGBDriver(_LEDDriver):
     def __init__(self, red_pin = 0, green_pin = 1, blue_pin = 2, pwm = None):
@@ -188,7 +193,7 @@ class RGBDriver(_LEDDriver):
             )
         return self.current_color
 
-    def set_(self, rgb):
+    def set(self, rgb):
         """
         Input must be between 0 and 4095.
         """
@@ -196,21 +201,21 @@ class RGBDriver(_LEDDriver):
         self.pwm.setPWM(self.green_pin, rgb[1])
         self.pwm.setPWM(self.blue_pin, rgb[2])
         self.current_color = rgb
-    def to_(self, rgb, fade=DEFAULT_FADE):
+    def to(self, rgb, fade=DEFAULT_FADE):
         """
         Input must be between 0 and 4095.
         """
         self.from_to(self.current_color, rgb, fade)
 
     def set_rand(self, r_range=(0, 4095), g_range=(0, 4095), b_range=(0, 4095)):
-        self.set_((randrange(r_range[0], r_range[1]), randrange(g_range[0], g_range[1]), randrange(b_range[0], b_range[1])))
+        self.set((randrange(r_range[0], r_range[1]), randrange(g_range[0], g_range[1]), randrange(b_range[0], b_range[1])))
     def to_rand(self, r_range=(0, 4095), g_range=(0, 4095), b_range=(0, 4095), fade=DEFAULT_FADE):
-        self.to_((randrange(r_range[0], r_range[1]), randrange(g_range[0], g_range[1]), randrange(b_range[0], b_range[1])), fade)
+        self.to((randrange(r_range[0], r_range[1]), randrange(g_range[0], g_range[1]), randrange(b_range[0], b_range[1])), fade)
 
     def set_hex_color(self, color):
-        self.set_(RGBDriver.hex_to_rgb(color))
+        self.set(RGBDriver.hex_to_rgb(color))
     def to_hex_color(self, color, fade=DEFAULT_FADE):
-        self.to_(RGBDriver.hex_to_rgb(color), fade)
+        self.to(RGBDriver.hex_to_rgb(color), fade)
 
     def from_to(self, start, end, duration):
         duration = float(duration)
@@ -229,11 +234,11 @@ class RGBDriver(_LEDDriver):
             rgb[0] = start[0] + diff[0] * (elapsed / duration)
             rgb[1] = start[1] + diff[1] * (elapsed / duration)
             rgb[2] = start[2] + diff[2] * (elapsed / duration)
-            self.set_(map(int, rgb))
+            self.set(map(int, rgb))
 
-    def to_off(self):
-        self.to_((0, 0, 0))
-        self.set_((0, 0, 0))
+    def off(self):
+        self.to((0, 0, 0))
+        self.set((0, 0, 0))
 
 if __name__ == '__main__':
     import argparse
@@ -249,8 +254,8 @@ if __name__ == '__main__':
     try:
         if args.test:
             print "Starting everything off."
-            single_driver.set_(0)
-            rgb_driver.set_((0, 0, 0))
+            single_driver.set(0)
+            rgb_driver.set((0, 0, 0))
             def test_func_r(time):
                 return (math.sin(time/500) * 2047) + 2047
             def test_func_g(time):
@@ -281,7 +286,7 @@ if __name__ == '__main__':
             rgb_driver.to_hex_color("#000000")
             rgb_driver.set_hex_color("#000000")
             print "Turning simple led strip on and off."
-            single_driver.to_(4095)
+            single_driver.to(4095)
             single_driver.to_off()
         if args.color:
             rgb_driver.set_hex_color(args.color)
