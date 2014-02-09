@@ -69,11 +69,11 @@ class LEDDriver(object):
 class SingleLEDDriver(LEDDriver):
     def __init__(self, pin = 3, pwm = None):
         self.pin = pin
-        self.current_brightness = 0
         if pwm is None:
             self.pwm = self.setup_pwm()
         else:
             self.pwm = pwm
+        self.current_brightness = self.pwm.readPWM(self.pin)
 
     def from_to(self, start, end, duration, freq = 120):
         duration = float(duration)
@@ -119,7 +119,6 @@ class RGBDriver(LEDDriver):
                 self.pwm.readPWM(self.green_pin),
                 self.pwm.readPWM(self.blue_pin)
             )
-        #TODO Set self.current color after setting up pwm
 
     #TODO: convert to static method?
     def hex_to_(self, hex_color):
