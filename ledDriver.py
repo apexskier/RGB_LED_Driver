@@ -83,6 +83,7 @@ class _LEDDriver(object):
         """
         Turns light off
         """
+        pass
 
     def repeat(self, pin, function, duration=-1):
         """
@@ -102,13 +103,12 @@ class _LEDDriver(object):
         >>> r_r.start()
         The above cycles a sine function on pin 2 for 5 seconds.
         """
-        def repeat_internal(pin, function, duration=5000):
+        def repeat_internal(pin, function, duration):
             duration = float(duration)
             start_time = time.time()
             while True:
-                if duration < 0:
-                    elapsed = float(time.time() - start_time) * 1000
-                    if elapsed >= duration:
+                elapsed = float(time.time() - start_time) * 1000
+                if duration > 0 and elapsed >= duration:
                         break
                 self.pwm.setPWM(pin, function(elapsed))
         t = Thread(target=repeat_internal, args=(pin, function, duration))
@@ -137,7 +137,6 @@ class SingleLEDDriver(_LEDDriver):
 
     def set(self, l):
         """The rgb values must be between 0 and 4095"""
-        #print "R: %d, G: %d, B: %d" % (red_value, green_value, blue_value)
         self.pwm.setPWM(self.pin, l)
         self.current_brightness = l
     def to(self, l, fade=DEFAULT_FADE):
@@ -273,7 +272,7 @@ if __name__ == '__main__':
             g_r.join()
             b_r.join()
             print "Turning off, then fading to..."
-            rgb_driver.to_off()
+            rgb_driver.off()
             print "  white"
             rgb_driver.to_hex_color("#ffffff")
             print "  red"
@@ -287,10 +286,10 @@ if __name__ == '__main__':
             rgb_driver.set_hex_color("#000000")
             print "Turning simple led strip on and off."
             single_driver.to(4095)
-            single_driver.to_off()
+            single_driver.off()
         if args.color:
             rgb_driver.set_hex_color(args.color)
     finally:
         if args.off:
-            rgb_driver.to_off()
-            single_driver.to_off()
+            rgb_driver.off()
+            single_driver.off()
