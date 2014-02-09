@@ -12,62 +12,105 @@ import pwmDriver
 
 DEFAULT_FADE = 200
 
-class LEDDriver(object):
+class _LEDDriver(object):
+    """
+    Private class for use in this package. Defines procedures that should be
+    implemented by any extensions to the package.
+    """
+
     @staticmethod
     def setup_pwm(freq=200):
+        """
+        Sets up and returns a pulse-width modulation object for hardware
+        control.
+
+        Parameters
+        freq (optional): frequency for the PWM object.
+        """
         pwm = pwmDriver.PWM()
         pwm.setPWMFreq(freq)
         return pwm
 
     @staticmethod
     def convert_eight_to_twelve_bit(eight_bit):
-        """The PWM chip has 10 bit resolution, so we need to
-            convert regular 8 bit rgb codes
-        >>> RGB_Driver.convert_eight_to_ten_bit(0)
+        """
+        Returns a number converted between 0 and 4095 to between 0 and
+        255.
+
+        Parameters:
+        eight_bit: number to be converted
+
+        The PWM chip has 10 bit resolution, so we need to convert regular 8 bit
+        rgb codes
+        >>> instance.convert_eight_to_ten_bit(0)
         0
-        >>> RGB_Driver.convert_eight_to_ten_bit(255)
+        >>> instance.convert_eight_to_ten_bit(255)
         4080
-        >>> RGB_Driver.convert_eight_to_ten_bit(128)
+        >>> instance.convert_eight_to_ten_bit(128)
         2048
         """
         return eight_bit << 4
 
     @staticmethod
     def randrange(start, stop, step = 1):
-        """A slightly modified version of randrange which allows start==stop"""
+        """
+        A slightly modified version of randrange which allows start==stop
+        """
         if start == stop:
             return start
         else:
             return randrange(start, stop, step)
 
-    def from_to(self, start, end, duration, freq = 120):
+    def from_to(self, start, end, duration):
+        """
+        Fade from one value [start] to another [end] over a specified time
+        [duration] in milliseconds.
+        """
         pass
 
     def set_(self, target):
-        # change to target
-        # update stored value
+        """
+        Set value [target]
+        """
         pass
-    def to_(self, target):
+    def to_(self, target, fade=DEFAULT_FADE):
+        """
+        Fade to value [target] over a time [fade (optional)] in milliseconds.
+        """
         pass
 
-    def repeat(self, pin, function, duration):
+    def repeat(self, pin, function, duration=-1):
         """
-        function should return a value between 0 and 4095 and take in a time in
-        milliseconds
+        Cycle a pin over an arbitrary [function] for a time [duration] in
+        milliseconds.
+        Returns a thread object that must be started.
+
+        Parameters
+        pin: I2C microcontroller pin.
+        function: Should return a value between 0 and 4095 and take in a time
+                  in milliseconds
+        duration: time in milliseconds
+
+        >>> def sinefunc(time):
+                return (math.sin(time/500 + 2000) * 2047) + 2047
+        >>> r = rgb_driver.repeat(2, sinefunc, 5000)
+        >>> r_r.start()
+        The above cycles a sine function on pin 2 for 5 seconds.
         """
         def repeat_internal(pin, function, duration=5000):
             duration = float(duration)
             start_time = time.time()
             while True:
-                elapsed = float(time.time() - start_time) * 1000
-                if elapsed >= duration:
-                    break
+                if duration < 0:
+                    elapsed = float(time.time() - start_time) * 1000
+                    if elapsed >= duration:
+                        break
                 self.pwm.setPWM(pin, function(elapsed))
         t = Thread(target=repeat_internal, args=(pin, function, duration))
         return t
 
-class SingleLEDDriver(LEDDriver):
-    def __init__(self, pin = 3, pwm = None):
+class SingleLEDDriver(_LEDDriver):
+    def __init__(self, pin=3, pwm=None):
         self.pin = pin
         if pwm is None:
             self.pwm = self.setup_pwm()
@@ -75,7 +118,7 @@ class SingleLEDDriver(LEDDriver):
             self.pwm = pwm
         self.current_brightness = self.pwm.readPWM(self.pin)
 
-    def from_to(self, start, end, duration, freq = 120):
+    def from_to(self, start, end, duration):
         duration = float(duration)
         diff = end - start
 
@@ -85,7 +128,6 @@ class SingleLEDDriver(LEDDriver):
             if elapsed >= duration:
                 break
             l = start + diff * (elapsed / duration)
-            #time.sleep(float(freq) / 1000)
             self.set_(l)
 
     def set_(self, l):
@@ -105,7 +147,7 @@ class SingleLEDDriver(LEDDriver):
         self.to_(0)
         self.set_(0)
 
-class RGBDriver(LEDDriver):
+class RGBDriver(_LEDDriver):
     def __init__(self, red_pin = 0, green_pin = 1, blue_pin = 2, pwm = None):
         self.red_pin = red_pin
         self.green_pin = green_pin
@@ -165,7 +207,7 @@ class RGBDriver(LEDDriver):
     def to_hex_color(self, color, fade=DEFAULT_FADE):
         self.to_(self.hex_to_(color), fade)
 
-    def from_to(self, start, end, duration, freq = 120):
+    def from_to(self, start, end, duration):
         duration = float(duration)
         rgb = list(start)
         diff = [
