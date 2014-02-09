@@ -1,5 +1,5 @@
 import time, math
-import wiringpi2
+import wiringpi2 as wiringpi
 
 """
 WiringPi2 version of Adafruit_PWM_Servo_Driver.
@@ -56,8 +56,8 @@ class PWM(object):
                  Find using `i2cdetect -y [0|1]`
         debug: Boolean value specifying whether or not to print debug messages.
         """
-        wiringpi2.wiringPiSetupSys()
-        self.i2c = wiringpi2.I2C()
+        wiringpi.wiringPiSetupSys()
+        self.i2c = wiringpi.I2C()
         self.fd = self.i2c.setupInterface('/dev/i2c-' + str(PWM.getPiI2CBusNumber()), address)
         self.address = address
         self.debug = debug

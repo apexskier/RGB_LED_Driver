@@ -8,14 +8,14 @@ http://www.adafruit.com/products/815
 import time, re, math
 from random import randrange
 from threading import Thread
-import PWMDriver
+import pwmDriver
 
 DEFAULT_FADE = 200
 
 class LEDDriver(object):
     @staticmethod
     def setup_pwm(freq=200):
-        pwm = PWMDriver.PWM()
+        pwm = pwmDriver.PWM()
         pwm.setPWMFreq(freq)
         return pwm
 
@@ -110,11 +110,15 @@ class RGBDriver(LEDDriver):
         self.red_pin = red_pin
         self.green_pin = green_pin
         self.blue_pin = blue_pin
-        self.current_color = (0, 0, 0)
         if pwm is None:
             self.pwm = self.setup_pwm()
         else:
             self.pwm = pwm
+        self.current_color = (
+                self.pwm.readPWM(self.red_pin),
+                self.pwm.readPWM(self.green_pin),
+                self.pwm.readPWM(self.blue_pin)
+            )
         #TODO Set self.current color after setting up pwm
 
     #TODO: convert to static method?
@@ -134,6 +138,14 @@ class RGBDriver(LEDDriver):
         else:
             print "Invalid hex color supplied: {:s}".format(hex_color)
             return None
+
+    def update_color(self):
+        self.current_color = (
+                self.pwm.readPWM(self.red_pin),
+                self.pwm.readPWM(self.green_pin),
+                self.pwm.readPWM(self.blue_pin)
+            )
+        return self.current_color
 
     def set_(self, rgb):
         """The rgb values must be between 0 and 4095"""
