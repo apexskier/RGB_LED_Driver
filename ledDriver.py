@@ -9,6 +9,7 @@ import time, re, math
 from random import randrange
 from threading import Thread
 import pwmDriver
+import colorsys
 
 DEFAULT_FADE = 200
 
@@ -49,7 +50,7 @@ class _LEDDriver(object):
         >>> instance.convert_eight_to_ten_bit(128)
         2048
         """
-        return eight_bit << 4
+        return (eight_bit / 255) * 4095
 
     @staticmethod
     def randrange(start, stop, step = 1):
@@ -114,6 +115,9 @@ class _LEDDriver(object):
         t = Thread(target=repeat_internal, args=(pin, function, duration))
         return t
 
+    def get(self):
+        return self.current_val
+
 class SingleLEDDriver(_LEDDriver):
     def __init__(self, pin=3, pwm=None):
         self.pin = pin
@@ -121,7 +125,7 @@ class SingleLEDDriver(_LEDDriver):
             self.pwm = self.setup_pwm()
         else:
             self.pwm = pwm
-        self.current_brightness = self.pwm.readPWM(self.pin)
+        self.current_val = self.pwm.readPWM(self.pin)
 
     def from_to(self, start, end, duration):
         duration = float(duration)
@@ -138,9 +142,9 @@ class SingleLEDDriver(_LEDDriver):
     def set(self, l):
         """The rgb values must be between 0 and 4095"""
         self.pwm.setPWM(self.pin, l)
-        self.current_brightness = l
+        self.current_val = l
     def to(self, l, fade=DEFAULT_FADE):
-        self.from_to(self.current_brightness, l, fade)
+        self.from_to(self.current_val, l, fade)
 
     def set_rand(self, l_range=(0, 4095)):
         self.set(randrange(l_range[0], l_range[1]))
@@ -151,6 +155,9 @@ class SingleLEDDriver(_LEDDriver):
         self.to(0)
         self.set(0)
 
+    def get(self):
+        return 255 * (float(self.current_val) / 4095.0)
+
 class RGBDriver(_LEDDriver):
     def __init__(self, red_pin = 0, green_pin = 1, blue_pin = 2, pwm = None):
         self.red_pin = red_pin
@@ -160,7 +167,7 @@ class RGBDriver(_LEDDriver):
             self.pwm = self.setup_pwm()
         else:
             self.pwm = pwm
-        self.current_color = (
+        self.current_val = (
                 self.pwm.readPWM(self.red_pin),
                 self.pwm.readPWM(self.green_pin),
                 self.pwm.readPWM(self.blue_pin)
@@ -176,21 +183,21 @@ class RGBDriver(_LEDDriver):
             b = _LEDDriver.convert_eight_to_twelve_bit(int(hex_match.group(3), 16))
             return (r, g, b)
         elif hex_color == "rand" or hex_color == "random":
-            r = randrange(0, 4080)
-            g = randrange(0, 4080)
-            b = randrange(0, 4080)
+            r = randrange(0, 4095)
+            g = randrange(0, 4095)
+            b = randrange(0, 4095)
             return (r, g, b)
         else:
             print "Invalid hex color supplied: {:s}".format(hex_color)
             return None
 
     def update_color(self):
-        self.current_color = (
+        self.current_val = (
                 self.pwm.readPWM(self.red_pin),
                 self.pwm.readPWM(self.green_pin),
                 self.pwm.readPWM(self.blue_pin)
             )
-        return self.current_color
+        return self.current_val
 
     def set(self, rgb):
         """
@@ -199,17 +206,32 @@ class RGBDriver(_LEDDriver):
         self.pwm.setPWM(self.red_pin, rgb[0])
         self.pwm.setPWM(self.green_pin, rgb[1])
         self.pwm.setPWM(self.blue_pin, rgb[2])
-        self.current_color = rgb
+        self.current_val = rgb
     def to(self, rgb, fade=DEFAULT_FADE):
         """
         Input must be between 0 and 4095.
         """
-        self.from_to(self.current_color, rgb, fade)
+        self.from_to(self.current_val, rgb, fade)
 
     def set_rand(self, r_range=(0, 4095), g_range=(0, 4095), b_range=(0, 4095)):
         self.set((randrange(r_range[0], r_range[1]), randrange(g_range[0], g_range[1]), randrange(b_range[0], b_range[1])))
     def to_rand(self, r_range=(0, 4095), g_range=(0, 4095), b_range=(0, 4095), fade=DEFAULT_FADE):
         self.to((randrange(r_range[0], r_range[1]), randrange(g_range[0], g_range[1]), randrange(b_range[0], b_range[1])), fade)
+
+    def set_rgb(self, color):
+        c = (
+                4095 * color[0],
+                4095 * color[1],
+                4095 * color[2]
+            )
+        self.set(c)
+    def to_rgb(self, color, fade=DEFAULT_FADE):
+        c = (
+                4095 * color[0],
+                4095 * color[1],
+                4095 * color[2]
+            )
+        self.to(c, fade)
 
     def set_hex_color(self, color):
         self.set(RGBDriver.hex_to_rgb(color))
@@ -238,6 +260,13 @@ class RGBDriver(_LEDDriver):
     def off(self):
         self.to((0, 0, 0))
         self.set((0, 0, 0))
+
+    def get(self):
+        return (
+                255 * (float(self.current_val[0]) / 4095.0),
+                255 * (float(self.current_val[1]) / 4095.0),
+                255 * (float(self.current_val[2]) / 4095.0),
+            )
 
 if __name__ == '__main__':
     import argparse
