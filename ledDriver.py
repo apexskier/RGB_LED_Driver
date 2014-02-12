@@ -127,6 +127,9 @@ class SingleLEDDriver(_LEDDriver):
             self.pwm = pwm
         self.current_val = self.pwm.readPWM(self.pin)
 
+    def __repr__(self):
+        return "leddriver"
+
     def from_to(self, start, end, duration):
         duration = float(duration)
         diff = end - start
@@ -172,6 +175,9 @@ class RGBDriver(_LEDDriver):
                 self.pwm.readPWM(self.green_pin),
                 self.pwm.readPWM(self.blue_pin)
             )
+
+    def __repr__(self):
+        return "rgbdriver"
 
     @staticmethod
     def hex_to_rgb(hex_color):
@@ -263,9 +269,9 @@ class RGBDriver(_LEDDriver):
 
     def get(self):
         return (
-                255 * (float(self.current_val[0]) / 4095.0),
-                255 * (float(self.current_val[1]) / 4095.0),
-                255 * (float(self.current_val[2]) / 4095.0),
+                (float(self.current_val[0]) / 4095.0),
+                (float(self.current_val[1]) / 4095.0),
+                (float(self.current_val[2]) / 4095.0),
             )
 
 if __name__ == '__main__':
